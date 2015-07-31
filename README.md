@@ -22,7 +22,32 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+```ruby
+class ShoppingCart < ActiveRecord::Base
+  extend Enumerize
+  extend EnumerizeWithGroups # extend this module after `extend Enumerize`
+
+  # define enumerize with groups
+  enumerize :item,
+            in: %i(banana apple football basketball),
+            groups: {
+              fruit: %i(banana apple),
+              ball: %i(football basketball)
+            }
+end
+
+ShoppingCart.item_groups  =>  # {
+                              #   fruit: %i(banana apple),
+                              #   ball: %i(football basketball)
+                              # }
+
+ShoppingCart.item_fruit   =>  # [:banana, :apple]
+
+# if you use `ActiveRecord::Base`
+ShoppingCart.item_fruit_scope # ShoppingCart.where(item: %w(banana apple))
+
+```
+
 
 ## Development
 

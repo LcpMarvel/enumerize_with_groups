@@ -11,7 +11,7 @@ Gem::Specification.new do |spec|
 
   spec.summary       = %q{Add groups option for enumerize.}
   spec.description   = %q{Add groups option for enumerize.}
-  spec.homepage      = ""
+  spec.homepage      = "https://github.com/LcpMarvel/enumerize_with_groups"
   spec.license       = "MIT"
 
   # Prevent pushing this gem to RubyGems.org by setting 'allowed_push_host', or
