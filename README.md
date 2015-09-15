@@ -43,6 +43,9 @@ ShoppingCart.item_groups  =>  # {
 
 ShoppingCart.item_fruit   =>  # [:banana, :apple]
 
+ShoppingCart.last.in_item_fruit?  => # true
+
+
 # if you use `ActiveRecord::Base`
 ShoppingCart.item_fruit_scope # ShoppingCart.where(item: %w(banana apple))
 

@@ -25,6 +25,13 @@ module EnumerizeWithGroups
               items
             end
 
+            define_method("in_#{name}_#{key}?") do
+              values = options[:groups][key]
+              fail "You have to define #{key} as group" unless values.is_a?(Array)
+
+              values.map(&:to_s).include?(self.public_send(name))
+            end
+
             if self.ancestors.include?(ActiveRecord::Base)
               scope scope_name, ->{ where(name => items) }
 
