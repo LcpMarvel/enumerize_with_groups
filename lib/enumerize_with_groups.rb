@@ -10,37 +10,50 @@ module EnumerizeWithGroups
     end
 
     mod.module_eval do
+      def self.define_active_record_scope(name, key, items)
+        return unless self.ancestors.include?(ActiveRecord::Base)
+
+        scope_name = "enumerize_with_groups_#{name}_#{key}_group"
+        scope scope_name, -> { where(name => items) }
+
+        self.define_singleton_method("#{name}_#{key}_scope") do
+          self.send(scope_name)
+        end
+      end
+
+      def self.define_group_check_methods(name, key, items)
+        define_method("in_#{name}_#{key}?") do
+          fail "You have to define #{key} as group" unless items.is_a?(Array)
+
+          items.map(&:to_s).include?(self.public_send(name))
+        end
+      end
+
+      def self.define_methods_of_groups(name, groups)
+        self.define_singleton_method("#{name}_groups") do
+          groups
+        end
+
+        return unless groups.present?
+        groups = groups.freeze
+
+        groups.each do |key, items|
+          next unless items.present?
+          items = items.freeze
+
+          self.define_singleton_method("#{name}_#{key}") do
+            items
+          end
+
+          define_group_check_methods(name, key, items)
+          define_active_record_scope(name, key, items)
+        end
+      end
+
       def self.enumerize(name, options = {})
         super
 
-        self.define_singleton_method("#{name}_groups") do
-          options[:groups]
-        end
-
-        if options[:groups]
-          options[:groups].each do |key, items|
-            scope_name = "enumerize_with_groups_#{name}_#{key}_group"
-
-            self.define_singleton_method("#{name}_#{key}") do
-              items
-            end
-
-            define_method("in_#{name}_#{key}?") do
-              values = options[:groups][key]
-              fail "You have to define #{key} as group" unless values.is_a?(Array)
-
-              values.map(&:to_s).include?(self.public_send(name))
-            end
-
-            if self.ancestors.include?(ActiveRecord::Base)
-              scope scope_name, ->{ where(name => items) }
-
-              self.define_singleton_method("#{name}_#{key}_scope") do
-                self.send(scope_name)
-              end
-            end
-          end
-        end
+        define_methods_of_groups(name, options[:groups])
       end
     end
   end

@@ -30,13 +30,21 @@ describe EnumerizeWithGroups do
     })
   end
 
-  it "define methods to show items for specify group" do
+  it "can not be motify for groups" do
+    expect {
+      klass.item_fruit << :pineapple
+    }.to raise_error("can't modify frozen Array")
+  end
+
+  it "defines methods to show items for specify group" do
     expect(klass.item_fruit).to eq([:banana, :apple])
   end
 
   it "defines method to determine group includes the specify value" do
-    object.item = "banana"
-    expect(object.in_item_fruit?).to be_truthy
+    %w(banana apple).each do |item|
+      object.item = item
+      expect(object.in_item_fruit?).to be_truthy
+    end
 
     object.item = "football"
     expect(object.in_item_fruit?).to be_falsy
